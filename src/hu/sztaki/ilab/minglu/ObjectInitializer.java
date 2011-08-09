@@ -3,6 +3,7 @@ package hu.sztaki.ilab.minglu;
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 public class ObjectInitializer {
 
@@ -31,10 +32,23 @@ public class ObjectInitializer {
     if (null != initMethod) {
       try {
         initMethod.invoke(actualObject, new Object[]{});
-      } catch (Exception e) {
-        throw new IllegalStateException("ERROR in GluManager: init " + actualName);
+      } catch (IllegalAccessException e) {
+        throw new IllegalStateException("IllegalAccessException occured:" +
+            e.toString());
+      } catch (InvocationTargetException e) {
+        handleExceptions(e);
       }
     }
+  }
+
+  private void handleExceptions(java.lang.reflect.InvocationTargetException e) {
+    Throwable throwable = e.getTargetException();
+    if (throwable instanceof NotFoundRuleException) {
+      throw (NotFoundRuleException)throwable;
+    }
+    throwable.printStackTrace();
+    throw new RuntimeException("Exception occured during invoking init(): " +
+        throwable.toString());
   }
 
   private Method getInitMethod() {
