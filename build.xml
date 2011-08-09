@@ -12,7 +12,6 @@
   <property name="test.build.dir" value="${build.root}/test"/>
   <property name="test.build.classes" value="${test.build.dir}/classes"/>
   <property name="test.log.dir" value="${test.build.dir}/logs"/>
-<!--  <property name="test.include" value="*Test"/> -->
   <property name="test.include" value="Test*"/>
   <property name="test.classpath.id" value="test.classpath"/>
   <property name="test.output" value="yes"/>
@@ -38,9 +37,10 @@
   </path>
 
   <target name="clean">
-    <delete dir="tmp" failonerror="false" includeemptydirs="true" quiet="true">
-      <exclude name="eclipse/**" />
-    </delete>
+    <echo message="clean" /> 
+    <delete dir="build" failonerror="false" includeemptydirs="true" quiet="true" /> 
+    <delete dir="depcache" failonerror="false" includeemptydirs="true" quiet="true" /> 
+    <delete file="minglu.jar" failonerror="false" includeemptydirs="true" quiet="true" /> 
   </target>
 
   <!-- ================================================================== -->
