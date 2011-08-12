@@ -44,7 +44,7 @@ public class GluManager {
     }
   }
 
-  public Object containsKey(String id) {
+  public boolean containsKey(String id) {
     return nameToObject.containsKey(id);
   }
 }
