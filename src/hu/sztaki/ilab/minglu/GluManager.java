@@ -16,10 +16,19 @@ public class GluManager {
   private Map<String, Object> nameToObject = new HashMap<String, Object>();
 
   public void add(String name, Object obj, String ruleString) {
+    checkForMultipleRegistrations(name);
     ObjectDescriptor descriptor = new ObjectDescriptor(name, obj,
         parseRules(ruleString));
     nameToObject.put(name, obj);
     objects.add(descriptor);
+  }
+
+  private void checkForMultipleRegistrations(String name) {
+    if (nameToObject.containsKey(name)) {
+      throw new MultipleRegistrationException(
+          "This id has been already registered in GluManager:\""
+          + name + "\"");
+    }
   }
 
   private Map<String, String> parseRules(String ruleString) {

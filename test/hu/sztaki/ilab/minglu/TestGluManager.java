@@ -95,6 +95,17 @@ public class TestGluManager extends TestCase {
     }
   }
 
+  public void testMultipleRegistrations() {
+    final List<String> flow = new ArrayList<String>();
+    GluManager minGlu = new GluManager();
+    ATestObject a1 = new ATestObject(flow);
+    minGlu.add("a1", a1, "B <- b");
+    try {
+      minGlu.add("a1", a1, "B <- b");
+      fail("Allows multiple registrations.");
+    } catch (MultipleRegistrationException e) {}
+  }
+
   public static Test suite() {
     return new TestSuite(TestGluManager.class);
   }
