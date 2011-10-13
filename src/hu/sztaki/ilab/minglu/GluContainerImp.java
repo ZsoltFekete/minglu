@@ -34,7 +34,7 @@ class GluContainerImpl implements GluContainer {
     } else {
       throw new IllegalStateException("ERROR in GluContainer get call for" +
           " object with id \"" + myId+
-          "\": no instances with id \"(" + id + "\"");
+          "\": no instances with id \"" + id + "\"");
     }
   }
 

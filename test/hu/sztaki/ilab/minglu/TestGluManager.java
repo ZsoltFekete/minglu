@@ -45,6 +45,28 @@ public class TestGluManager extends TestCase {
     assertTrue(b.a2 == a2);
   }
 
+  public void testSimpleWithAtRule() {
+    final List<String> flow = new ArrayList<String>();
+    GluManager minGlu = new GluManager();
+    ATestObject a1 = new ATestObject(flow);
+    ATestObject a2 = new ATestObject(flow);
+    BTestObject b = new BTestObject(flow);
+    minGlu.add("a1", a1, "@B");
+    minGlu.add("a2", a2, "B<- B");
+    minGlu.add("B", b, "A1 <- a1, A2 <- a2");
+    minGlu.setDependencies();
+    minGlu.init();
+    assertTrue(6 == flow.size());
+    assertTrue(flow.get(0).equals("a_set_dep"));
+    assertTrue(flow.get(1).equals("a_set_dep"));
+    assertTrue(flow.get(2).equals("b_set_dep"));
+    assertTrue(flow.get(3).equals("a_init"));
+    assertTrue(flow.get(4).equals("a_init"));
+    assertTrue(flow.get(5).equals("b_init"));
+    assertTrue(b.a1 == a1);
+    assertTrue(b.a2 == a2);
+  }
+
   public void testIncompleteRule() {
     final List<String> flow = new ArrayList<String>();
     GluManager minGlu = new GluManager();
