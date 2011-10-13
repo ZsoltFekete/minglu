@@ -54,12 +54,12 @@ class RuleParser {
   }
 
   private void processAtRule(String rule) {
-    String[] one_rule_vector = rule.split("@");
-    if (2 != one_rule_vector.length) {
+    String[] ruleArray = rule.split("@");
+    if (2 != ruleArray.length) {
       throwIncorrectRuleError(rule);
     }
-    String beforeAt = one_rule_vector[0].trim();
-    String afterAt = one_rule_vector[1].trim();
+    String beforeAt = ruleArray[0].trim();
+    String afterAt = ruleArray[1].trim();
     if (!beforeAt.equals("")) {
       throwIncorrectRuleError(rule);
     }
@@ -69,14 +69,15 @@ class RuleParser {
   private void addRule(String ruleKey, String ruleValue) {
     rules.put(ruleKey, ruleValue);
     if (definedRuleKeys.contains(ruleKey)) {
-      throw new MultipleRulesException("Rule-key \"" + ruleKey +"\" is multiple defined.");
+      throw new MultipleRulesException("Rule-key \"" + ruleKey +
+          "\" is multiple defined.");
     }
     definedRuleKeys.add(ruleKey);
   }
 
   private void throwIncorrectRuleError(String rule) {
-    throw new IllegalArgumentException("ERROR in GluManager.add: incorrect rule: \"" +
-      rule + "\"");
+    throw new IllegalArgumentException("ERROR in GluManager.add: incorrect" +
+        " rule: \"" + rule + "\"");
   }
 
   private boolean contains(String str, String pattern) {
