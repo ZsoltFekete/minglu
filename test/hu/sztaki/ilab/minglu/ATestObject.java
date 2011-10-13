@@ -4,7 +4,7 @@ import java.util.List;
 
 class ATestObject {
   private List<String> flow;
-  private BTestObject b;
+  public BTestObject b;
 
   public ATestObject(List<String> flow) {
     this.flow = flow;

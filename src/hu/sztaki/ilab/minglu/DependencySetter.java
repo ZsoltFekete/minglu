@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
+
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 
 public class DependencySetter {
 
@@ -41,10 +45,51 @@ public class DependencySetter {
       }
     }
   }
+  
+  private Set<String> usedRules = new HashSet<String>();
 
   private void runSetDependenciesMethodCheckExcpetions() {
+    setDependenciesByAnnotation();
     setDepMethod = getSetDependenciesMethod();
-    if (null == setDepMethod) return;
+    if (null != setDepMethod) {
+      setDependenciesByMethod();
+    }
+    checkForUnusedRules();
+  }
+
+  private void setDependenciesByAnnotation() {
+    Class cls = actualObject.getClass();
+    Field fieldlist[] = cls.getDeclaredFields();
+    for (int i = 0; i < fieldlist.length; i++) {
+      Field field = fieldlist[i];
+      Inject annotation = field.getAnnotation(Inject.class);
+      if (null != annotation) {
+        String propertyName = annotation.value();
+        if (!actualRules.containsKey(propertyName)) {
+          throw new NotFoundRuleException("ERROR in GluContainer get call for" +
+            " object with id \"" + actualName + "\":" + "there is no rule for name \"" +
+            propertyName + "\"");
+        }
+        String nameOfObject = actualRules.get(propertyName);
+        if (!nameToObject.containsKey(nameOfObject)) {
+          throw new IllegalStateException("ERROR in GluContainer get call for" +
+            " object with id \"" + actualName +
+            "\": no instances with id \"" + nameOfObject + "\"");
+        }
+        Object objectToInject = nameToObject.get(nameOfObject);
+        field.setAccessible(true);
+        try {
+          field.set(actualObject, objectToInject);
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+          throw new RuntimeException(e);
+        }
+        usedRules.add(propertyName);
+      }
+    }
+  }
+
+  private void setDependenciesByMethod() {
     try {
       runSetDependenciesMethod();
     } catch (IllegalAccessException e) {
@@ -53,13 +98,12 @@ public class DependencySetter {
     } catch (InvocationTargetException e) {
       handleExceptions(e);
     }
-    gluContainer.checkForUnusedRules();
   }
 
   private void runSetDependenciesMethod() throws InvocationTargetException,
           IllegalAccessException{
     gluContainer = new GluContainerImpl(actualRules, nameToObject,
-        actualName);
+        actualName, usedRules);
     Object[] setDependenciesParams = new Object[] {gluContainer};
     setDepMethod.invoke(actualObject, setDependenciesParams);
   }
@@ -84,6 +128,14 @@ public class DependencySetter {
       throwable.toString());
   }
 
+  void checkForUnusedRules() {
+    for (String ruleKey : actualRules.keySet()) {
+      if (!usedRules.contains(ruleKey)) {
+        throw new UnusedRuleException("Unused rule in \"" + actualName + "\": \""
+            + ruleKey + "<-" + actualRules.get(ruleKey) + "\"");
+      }
+    }
+  }
 }
 
 

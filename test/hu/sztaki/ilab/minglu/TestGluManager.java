@@ -43,6 +43,8 @@ public class TestGluManager extends TestCase {
     assertTrue(flow.get(5).equals("b_init"));
     assertTrue(b.a1 == a1);
     assertTrue(b.a2 == a2);
+    assertTrue(a1.b == b);
+    assertTrue(a2.b == b);
   }
 
   public void testSimpleWithAtRule() {
@@ -84,6 +86,23 @@ public class TestGluManager extends TestCase {
     }
   }
 
+  public void testIncompleteRuleWithAnnotation() {
+    final List<String> flow = new ArrayList<String>();
+    GluManager minGlu = new GluManager();
+    CTestObject c1 = new CTestObject(flow);
+    CTestObject c2 = new CTestObject(flow);
+    DTestObject d = new DTestObject(flow);
+    minGlu.add("c1", c1, "D <- d");
+    minGlu.add("c2", c2, "D<- d");
+    minGlu.add("d", d, "C1 <- c1");
+    try {
+      minGlu.setDependencies();
+      fail("Allows incomplete rule");
+    } catch (NotFoundRuleException e) {
+      System.out.println(e.toString());
+    }
+  }
+
   public void testTooManyRule() {
     final List<String> flow = new ArrayList<String>();
     GluManager minGlu = new GluManager();
@@ -93,6 +112,23 @@ public class TestGluManager extends TestCase {
     minGlu.add("a1", a1, "B <- b");
     minGlu.add("a2", a2, "B<- b");
     minGlu.add("b", b, "A1 <- a1, A2<- a2, A3 <-a1");
+    try {
+      minGlu.setDependencies();
+      fail("Allows too many rule");
+    } catch (UnusedRuleException e) {
+      System.out.println(e.toString());
+    }
+  }
+
+  public void testTooManyRuleWithAnnotation() {
+    final List<String> flow = new ArrayList<String>();
+    GluManager minGlu = new GluManager();
+    CTestObject c1 = new CTestObject(flow);
+    CTestObject c2 = new CTestObject(flow);
+    DTestObject d = new DTestObject(flow);
+    minGlu.add("c1", c1, "D <- d");
+    minGlu.add("c2", c2, "D<- d");
+    minGlu.add("d", d, "C1 <- c1, C2<- c2, C3 <-c1");
     try {
       minGlu.setDependencies();
       fail("Allows too many rule");
@@ -139,15 +175,15 @@ public class TestGluManager extends TestCase {
     minGlu.add("d", d, "C1 <- c1, C2 <- c2");
     minGlu.setDependencies();
     minGlu.init();
-    assertTrue(6 == flow.size());
-    assertTrue(flow.get(0).equals("c_set_dep"));
-    assertTrue(flow.get(1).equals("c_set_dep"));
-    assertTrue(flow.get(2).equals("d_set_dep"));
-    assertTrue(flow.get(3).equals("c_init"));
-    assertTrue(flow.get(4).equals("c_init"));
-    assertTrue(flow.get(5).equals("d_init"));
+    assertEquals(4, flow.size());
+    assertTrue(flow.get(0).equals("d_set_dep"));
+    assertTrue(flow.get(1).equals("c_init"));
+    assertTrue(flow.get(2).equals("c_init"));
+    assertTrue(flow.get(3).equals("d_init"));
     assertTrue(d.c1 == c1);
     assertTrue(d.c2 == c2);
+    assertTrue(c1.d == d);
+    assertTrue(c2.d == d);
   }
 
 

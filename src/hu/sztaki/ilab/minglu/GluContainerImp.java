@@ -1,21 +1,20 @@
 package hu.sztaki.ilab.minglu;
 
 import java.util.Map;
-import java.util.HashSet;
 import java.util.Set;
 
 class GluContainerImpl implements GluContainer {
   private Map<String, String> rules;
   private Map<String, Object> objects;
   private String myId;
-
-  private Set<String> usedRules = new HashSet<String>();
+  private Set<String> usedRules;
 
   GluContainerImpl(Map<String, String> rules, Map<String, Object> objects,
-      String myId) {
+      String myId, Set<String> usedRules) {
     this.rules = rules;
     this.objects = objects;
     this.myId = myId;
+    this.usedRules = usedRules;
   }
 
   public Object get(String name) {
@@ -35,15 +34,6 @@ class GluContainerImpl implements GluContainer {
       throw new IllegalStateException("ERROR in GluContainer get call for" +
           " object with id \"" + myId+
           "\": no instances with id \"" + id + "\"");
-    }
-  }
-
-  void checkForUnusedRules() {
-    for (String ruleKey : rules.keySet()) {
-      if (!usedRules.contains(ruleKey)) {
-        throw new UnusedRuleException("Unused rule in \"" + myId + "\": \""
-            + ruleKey + "<-" + rules.get(ruleKey) + "\"");
-      }
     }
   }
 }
