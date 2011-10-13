@@ -101,7 +101,7 @@ public class TestRuleParser extends TestCase {
     assertEquals("zz", rules.get("zz"));
     assertEquals("cc", rules.get("cc"));
   }
-/*
+
   public void testBadRule3() {
     String ruleString = "@ aaa  <- bb";
     RuleParser ruleParser = new RuleParser(ruleString);
@@ -119,9 +119,6 @@ public class TestRuleParser extends TestCase {
       fail("Allows bad rule");
     } catch (Exception e) {}
   }
-    */
-
-
 
   public static Test suite() {
     return new TestSuite(TestRuleParser.class);
