@@ -60,32 +60,48 @@ public class DependencySetter {
   private void setDependenciesByAnnotation() {
     Class cls = actualObject.getClass();
     Field fieldlist[] = cls.getDeclaredFields();
-    for (int i = 0; i < fieldlist.length; i++) {
-      Field field = fieldlist[i];
+    for (Field field : fieldlist) {
       Inject annotation = field.getAnnotation(Inject.class);
       if (null != annotation) {
         String propertyName = annotation.value();
-        if (!actualRules.containsKey(propertyName)) {
-          throw new NotFoundRuleException("ERROR in GluContainer get call for" +
-            " object with id \"" + actualName + "\":" + "there is no rule for name \"" +
-            propertyName + "\"");
-        }
-        String nameOfObject = actualRules.get(propertyName);
-        if (!nameToObject.containsKey(nameOfObject)) {
-          throw new IllegalStateException("ERROR in GluContainer get call for" +
-            " object with id \"" + actualName +
-            "\": no instances with id \"" + nameOfObject + "\"");
-        }
-        Object objectToInject = nameToObject.get(nameOfObject);
-        field.setAccessible(true);
-        try {
-          field.set(actualObject, objectToInject);
-        } catch (IllegalAccessException e) {
-          e.printStackTrace();
-          throw new RuntimeException(e);
-        }
-        usedRules.add(propertyName);
+        setDependenciesByAnnotationForField(field, propertyName);
       }
+    }
+  }
+
+  private void setDependenciesByAnnotationForField(Field field,
+      String propertyName) {
+    checkExistsRuleForProperty(propertyName);
+    String nameOfObject = actualRules.get(propertyName);
+    checkExistsObjectWithName(nameOfObject);
+    Object objectToInject = nameToObject.get(nameOfObject);
+    setField(field, objectToInject);
+    usedRules.add(propertyName);
+  }
+
+  private void checkExistsRuleForProperty(String propertyName) {
+    if (!actualRules.containsKey(propertyName)) {
+      throw new NotFoundRuleException("ERROR in GluContainer get call for" +
+        " object with id \"" + actualName + "\":" + "there is no rule for name \"" +
+        propertyName + "\"");
+    }
+  }
+
+  private void checkExistsObjectWithName(String nameOfObject) {
+    if (!nameToObject.containsKey(nameOfObject)) {
+      throw new IllegalStateException("ERROR in GluContainer get call for" +
+        " object with id \"" + actualName +
+        "\": no instances with id \"" + nameOfObject + "\"");
+    }
+  }
+
+  private void setField(Field field, Object objectToInject) {
+    field.setAccessible(true);
+    try {
+      field.set(actualObject, objectToInject);
+    } catch (IllegalAccessException e) {
+      e.printStackTrace();
+      throw new RuntimeException(e);
     }
   }
 
