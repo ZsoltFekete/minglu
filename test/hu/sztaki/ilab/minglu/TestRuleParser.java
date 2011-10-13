@@ -90,6 +90,38 @@ public class TestRuleParser extends TestCase {
     } catch (MultipleRulesException e) {}
   }
 
+  public void testSimplifiedRules() {
+    String ruleString = " aaa  <- bb , qqq <- xx, @zz, @cc";
+    RuleParser ruleParser = new RuleParser(ruleString);
+    ruleParser.run();
+    Map<String, String> rules = ruleParser.getRules();
+    assertEquals(4, rules.size());
+    assertEquals("bb", rules.get("aaa"));
+    assertEquals("xx", rules.get("qqq"));
+    assertEquals("zz", rules.get("zz"));
+    assertEquals("cc", rules.get("cc"));
+  }
+/*
+  public void testBadRule3() {
+    String ruleString = "@ aaa  <- bb";
+    RuleParser ruleParser = new RuleParser(ruleString);
+    try {
+      ruleParser.run();
+      fail("Allows bad rule");
+    } catch (Exception e) {}
+  }
+
+  public void testBadRule4() {
+    String ruleString = "aaa";
+    RuleParser ruleParser = new RuleParser(ruleString);
+    try {
+      ruleParser.run();
+      fail("Allows bad rule");
+    } catch (Exception e) {}
+  }
+    */
+
+
 
   public static Test suite() {
     return new TestSuite(TestRuleParser.class);

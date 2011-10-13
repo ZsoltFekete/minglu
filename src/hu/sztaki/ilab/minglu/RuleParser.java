@@ -19,8 +19,8 @@ class RuleParser {
       return;
     }
     String[] ruleArray = ruleString.split(",");
-    for (String oneRule : ruleArray) {
-      processOneRule(oneRule);
+    for (String rule : ruleArray) {
+      processOneRule(rule);
     }
   }
     
@@ -28,18 +28,58 @@ class RuleParser {
     return rules;
   }
 
-  private void processOneRule(String oneRule) {
-    String[] oneRuleArray = oneRule.split("<-");
-    if (2 == oneRuleArray.length) {
-      String ruleKey = oneRuleArray[0].trim();
-      rules.put(ruleKey, oneRuleArray[1].trim());
-      if (definedRuleKeys.contains(ruleKey)) {
-        throw new MultipleRulesException("Rule-key \"" + ruleKey +"\" is multiple defined.");
-      }
-      definedRuleKeys.add(ruleKey);
-    } else {
-      throw new IllegalArgumentException("ERROR in GluManager.add: incorrect rule: \"" +
-        oneRule + "\"");
+  private void processOneRule(String rule) {
+    boolean containsArrow = contains(rule, "<-");
+    boolean containsAt = contains(rule, "@");
+    if ((!containsArrow && !containsAt) || (containsArrow && containsAt)) {
+      throwIncorrectRuleError(rule);
     }
+    if (containsArrow) {
+      processArrowRule(rule);
+    }
+    if (containsAt) {
+      processAtRule(rule);
+    }
+  }
+
+  private void processArrowRule(String rule) {
+    String[] ruleArray = rule.split("<-");
+    if (2 == ruleArray.length) {
+      String ruleKey = ruleArray[0].trim();
+      String ruleValue = ruleArray[1].trim();
+      addRule(ruleKey, ruleValue);
+    } else {
+      throwIncorrectRuleError(rule);
+    }
+  }
+
+  private void processAtRule(String rule) {
+    String[] one_rule_vector = rule.split("@");
+    if (2 != one_rule_vector.length) {
+      throwIncorrectRuleError(rule);
+    }
+    String beforeAt = one_rule_vector[0].trim();
+    String afterAt = one_rule_vector[1].trim();
+    if (!beforeAt.equals("")) {
+      throwIncorrectRuleError(rule);
+    }
+    addRule(afterAt, afterAt);
+  }
+
+  private void addRule(String ruleKey, String ruleValue) {
+    rules.put(ruleKey, ruleValue);
+    if (definedRuleKeys.contains(ruleKey)) {
+      throw new MultipleRulesException("Rule-key \"" + ruleKey +"\" is multiple defined.");
+    }
+    definedRuleKeys.add(ruleKey);
+  }
+
+  private void throwIncorrectRuleError(String rule) {
+    throw new IllegalArgumentException("ERROR in GluManager.add: incorrect rule: \"" +
+      rule + "\"");
+  }
+
+  private boolean contains(String str, String pattern) {
+    return -1 != str.indexOf(pattern);
   }
 }
