@@ -96,7 +96,9 @@ public class DependencySetter {
   }
 
   private void setField(Field field, Object objectToInject) {
-    field.setAccessible(true);
+    try {
+      field.setAccessible(true);
+    } catch (Exception e) {}
     try {
       field.set(actualObject, objectToInject);
     } catch (IllegalAccessException e) {
