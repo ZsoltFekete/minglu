@@ -42,6 +42,28 @@ public class TestSimpleGlu extends TestCase {
     assertSame(g, e.g);
   }
 
+  public void testSimpleGluTooMayRules() {
+    ETestObject e = new ETestObject();
+    FTestObject f1 = new FTestObject();
+    FTestObject f2 = new FTestObject();
+    GTestObject g = new GTestObject();
+    try {
+      inject(e, inj("F1", f1), inj("F2", f2), inj("G", g), inj("G2", g));
+      fail("Expected exception.");
+    } catch (Exception exception) {}
+  }
+
+  public void testSimpleGluMissingRule() {
+    ETestObject e = new ETestObject();
+    FTestObject f1 = new FTestObject();
+    FTestObject f2 = new FTestObject();
+    GTestObject g = new GTestObject();
+    try {
+      inject(e, inj("F1", f1), inj("F2", f2));
+      fail("Expected exception.");
+    } catch (Exception exception) {}
+  }
+
 
   public static Test suite() {
     return new TestSuite(TestSimpleGlu.class);
