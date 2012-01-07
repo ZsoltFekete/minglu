@@ -27,8 +27,19 @@ public class TestSimpleGlu extends TestCase {
 
   public void testSimpleGlu() {
     ETestObject e = new ETestObject();
-    ETestObject other_e = inject(e, inj("F1", new FTestObject()), inj("F2", new FTestObject()),
+    inject(e, inj("F1", new FTestObject()), inj("F2", new FTestObject()),
         inj("G", new GTestObject()));
+  }
+
+  public void testSimpleGlu2() {
+    ETestObject e = new ETestObject();
+    FTestObject f1 = new FTestObject();
+    FTestObject f2 = new FTestObject();
+    GTestObject g = new GTestObject();
+    inject(e, inj("F1", f1), inj("F2", f2), inj("G", g));
+    assertSame(f1, e.f1);
+    assertSame(f2, e.f2);
+    assertSame(g, e.g);
   }
 
 
