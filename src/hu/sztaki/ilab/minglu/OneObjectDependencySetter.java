@@ -52,8 +52,16 @@ public class OneObjectDependencySetter {
 
   private void setDependenciesByAnnotation() {
     Class cls = actualObject.getClass();
-    Field fieldlist[] = cls.getDeclaredFields();
-    for (Field field : fieldlist) {
+    Class actualCls = cls;
+    List<Field> allFields = new ArrayList<Field>();
+    while (Object.class != actualCls) {
+      Field[] actualFields = actualCls.getDeclaredFields();
+      for (Field field : actualFields) {
+        allFields.add(field);
+      }
+      actualCls = actualCls.getSuperclass();
+    }
+    for (Field field : allFields) {
       Inject annotation = field.getAnnotation(Inject.class);
       if (null != annotation) {
         String propertyName = annotation.value();

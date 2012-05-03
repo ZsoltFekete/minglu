@@ -2,3 +2,5 @@ MinGlu - A minimal java dependecy injection.
 
 See the wiki pages on https://github.com/ZsoltFekete/minglu
 
+TODO: tests for accessing private fields
+      tests for accessing fields in superclass
