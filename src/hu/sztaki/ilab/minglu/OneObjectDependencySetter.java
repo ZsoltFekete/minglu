@@ -55,9 +55,14 @@ public class OneObjectDependencySetter {
     Class actualCls = cls;
     List<Field> allFields = new ArrayList<Field>();
     while (Object.class != actualCls) {
-      Field[] actualFields = actualCls.getDeclaredFields();
-      for (Field field : actualFields) {
-        allFields.add(field);
+      Field[] actualFields = null;
+      try {
+        actualFields = actualCls.getDeclaredFields();
+        for (Field field : actualFields) {
+          allFields.add(field);
+        }
+      } catch (Exception e) {
+        // cannot inject into these fields, but this is ok
       }
       actualCls = actualCls.getSuperclass();
     }
