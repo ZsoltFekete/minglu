@@ -15,6 +15,12 @@ public class GluManager {
 
   private Map<String, Object> nameToObject = new HashMap<String, Object>();
 
+  private boolean isAutomaticRules;
+
+  public void add(String name, Object obj) {
+    add(name, obj, "");
+  }
+  
   public void add(String name, Object obj, String ruleString) {
     checkForMultipleRegistrations(name);
     ObjectDescriptor descriptor = new ObjectDescriptor(name, obj,
@@ -38,7 +44,7 @@ public class GluManager {
   }
 
   public void setDependencies() {
-    new DependencySetter(objects, nameToObject).run();
+    new DependencySetter(objects, nameToObject, isAutomaticRules).run();
   }
 
   public void init() {
@@ -55,5 +61,9 @@ public class GluManager {
 
   public boolean containsKey(String id) {
     return nameToObject.containsKey(id);
+  }
+
+  public void setAutomaticRules(boolean b) {
+    isAutomaticRules = b;
   }
 }

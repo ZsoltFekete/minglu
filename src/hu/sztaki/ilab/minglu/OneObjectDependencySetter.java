@@ -16,6 +16,8 @@ public class OneObjectDependencySetter {
   private final Class[] setDependenciesParamTypes
     = new Class[] {GluContainer.class};
 
+  private boolean isAutomaticRules;
+
   private Map<String, Object> nameToObject;
 
   private Object actualObject;
@@ -26,11 +28,12 @@ public class OneObjectDependencySetter {
 
   public OneObjectDependencySetter(Object actualObject,
       Map<String, String> actualRules, Map<String, Object> nameToObject,
-      String actualName) {
+      String actualName, boolean isAutomaticRules) {
     this.actualObject = actualObject;
     this.actualRules = actualRules;
     this.actualName = actualName;
     this.nameToObject = nameToObject;
+    this.isAutomaticRules = isAutomaticRules;
   }
 
   public void run() {
@@ -40,6 +43,7 @@ public class OneObjectDependencySetter {
   }
   
   private Set<String> usedRules = new HashSet<String>();
+
 
   private void runSetDependenciesMethodCheckExcpetions() {
     setDependenciesByAnnotation();
@@ -77,10 +81,22 @@ public class OneObjectDependencySetter {
 
   private void setDependenciesByAnnotationForField(Field field,
       String propertyName) {
-    checkExistsRuleForProperty(propertyName);
-    String nameOfObject = actualRules.get(propertyName);
-    checkExistsObjectWithName(nameOfObject);
-    Object objectToInject = nameToObject.get(nameOfObject);
+    Object objectToInject = null;
+    if (!isAutomaticRules) {
+      checkExistsRuleForProperty(propertyName);
+      String nameOfObject = actualRules.get(propertyName);
+      checkExistsObjectWithName(nameOfObject);
+      objectToInject = nameToObject.get(nameOfObject);
+    } else {
+      String nameOfObject = null;
+      if (actualRules.containsKey(propertyName)) {
+        nameOfObject = actualRules.get(propertyName);
+      } else {
+        nameOfObject = propertyName;
+      }
+      checkExistsObjectWithName(nameOfObject);
+      objectToInject = nameToObject.get(nameOfObject);
+    }
     setField(field, objectToInject);
     usedRules.add(propertyName);
   }
@@ -127,7 +143,7 @@ public class OneObjectDependencySetter {
   private void runSetDependenciesMethod() throws InvocationTargetException,
           IllegalAccessException{
     gluContainer = new GluContainerImpl(actualRules, nameToObject,
-        actualName, usedRules);
+        actualName, usedRules, isAutomaticRules);
     Object[] setDependenciesParams = new Object[] {gluContainer};
     setDepMethod.invoke(actualObject, setDependenciesParams);
   }

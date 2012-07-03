@@ -23,9 +23,10 @@ public class SimpleGlu {
       assignmentMap.put(assignment.name, assignment.object);
     }
 
+    boolean isAutomaticRules = false;
     OneObjectDependencySetter oneObjectDependencySetter =
       new OneObjectDependencySetter(object, actualRules, assignmentMap,
-          object.getClass().toString());
+          object.getClass().toString(), isAutomaticRules);
     oneObjectDependencySetter.run();
   }
 

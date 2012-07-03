@@ -17,10 +17,13 @@ public class DependencySetter {
 
   private Map<String, Object> nameToObject;
 
+  private boolean isAutomaticRules;
+
   public DependencySetter(List<ObjectDescriptor> objects,
-      Map<String, Object> nameToObject) {
+      Map<String, Object> nameToObject, boolean isAutomaticRules) {
     this.objects = objects;
     this.nameToObject = nameToObject;
+    this.isAutomaticRules = isAutomaticRules;
   }
 
   public void run() {
@@ -36,7 +39,7 @@ public class DependencySetter {
 
       OneObjectDependencySetter oneObjectDependencySetter =
         new OneObjectDependencySetter(actualObject, actualRules, nameToObject,
-            actualName);
+            actualName, isAutomaticRules);
       oneObjectDependencySetter.run();
     }
   }
